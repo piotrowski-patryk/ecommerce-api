@@ -4,7 +4,9 @@ An Express.js backend application designed to handle e-commerce processes. The s
 
 <br>
 
-### 🛠️ Tools and Technologies
+Copyright (c) 2026 [Patryk Piotrowski](https://github.com/Xdellta). All rights reserved.
+
+<br>
 
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
@@ -15,46 +17,38 @@ An Express.js backend application designed to handle e-commerce processes. The s
 
 <br>
 
-### 📜 License
-
-![License](https://img.shields.io/badge/License-UNLICENSED-red?style=for-the-badge)
-Copyright (c) 2026 [Patryk Piotrowski](https://github.com/Xdellta). All rights reserved.
-
-<br>
-
 ## ⚙️ Configuration
 
-### 1. Environment Variables
-
-The application requires a `.env` file. Use the provided `[.env.example](./.env.example)` as a template.
-Copy the example file and fill in your credentials:
-
-```bash
-cp .env.example .env
-```
+> [!IMPORTANT]
+> ### Environment Variables
+> The application requires a `.env` file. Use the provided `[.env.example](./.env.example)` as a template.
+> Copy the example file and fill in your credentials:
+> ```sh
+> cp .env.example .env
+> ```
 
 <br>
 
-### 2. Database Setup
+> [!IMPORTANT]
+> ### Database Setup
+> Use the provided `[schema.sql](./schema.sql)` file to manually generate the database structure, triggers, and initial data.
 
-Use the provided `[schema.sql](./schema.sql)` file to manually generate the database structure, triggers, and initial data.
+<br>
 
-### 3. Installation & Execution
+### Installation & Execution
 
-Install dependencies and run the application:
-
-**Install packages**
-```bash
+```sh
+# Install packages
 npm install
 ```
 
-**Run in development mode (with nodemon)**
-```bash
+```sh
+# Run in development mode (with nodemon)
 npm run dev
 ```
 
-**Start in production mode**
-```bash
+```sh
+# Start in production mode
 npm start
 ```
 
