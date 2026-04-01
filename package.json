@@ -1,7 +1,19 @@
 {
   "name": "ecommerce-api",
   "version": "1.0.0",
-  "description": "Backend API for order processing and Tpay payment integration",
+  "description": "Express.js e-commerce backend with MySQL and Tpay payment integration.",
+  "keywords": [
+    "express",
+    "ecommerce",
+    "api",
+    "mysql",
+    "tpay",
+    "payments",
+    "backend",
+    "node",
+    "nodemailer",
+    "rest-api"
+  ],
   "main": "app.js",
   "type": "module",
   "private": true,
@@ -20,5 +32,13 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xdellta/ecommerce-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Xdellta/ecommerce-api/issues"
+  },
+  "homepage": "https://github.com/Xdellta/ecommerce-api#readme"
 }
