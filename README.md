@@ -56,7 +56,45 @@ npm start
 
 ## 🔌 API Endpoints
 
-All endpoints are prefixed with `/api`. Request and response bodies use **JSON** format.
+> [!NOTE]
+> **POST:** `/api/order/create`<br>
+> **Description:** `Adds the order to the database and returns a payment link.`
+>
+> <details>
+> <summary><b>REQUEST:</b></summary>
+> <br>
+>
+> ```json
+> {
+>     "name": "John Doe",
+>     "email": "client@example.com",
+>     "items": [
+>         {
+>             "id": 1,
+>             "quantity": 1
+>         },
+>         {
+>             "id": 2,
+>             "quantity": 13
+>         }
+>     ]
+> }
+> ```
+> </details>
+>
+> <details>
+> <summary><b>RESPONSE (201):</b></summary>
+> <br>
+>
+> ```json
+> {
+>     "status": "Success",
+>     "data": {
+>         "paymentLink": "[https://secure.example.com/payment/TR-XXXX-XXXXX](https://secure.example.com/payment/TR-XXXX-XXXXX)"
+>     }
+> }
+> ```
+> </details>
 
 <br>
 
