@@ -98,6 +98,26 @@ npm start
 
 <br>
 
+> [!NOTE]
+> **POST:** `/api/order/tpay-webhook`<br>
+> **Description:** `It retrieves the payment confirmation message from Tpay and updates the order status in the database.`
+>
+> <details>
+> <summary><b>REQUEST:</b></summary>
+> <br>
+>
+> ```json
+> {
+>     "tr_crc": "14",
+>     "tr_status": "TRUE"
+> }
+> ```
+> </details>
+>
+> **RESPONSE (201):** `TRUE`
+
+<br>
+
 ## ⚠️ Error Codes
 
 The API uses standard HTTP status codes. Common error responses:
