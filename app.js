@@ -4,9 +4,9 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import routes from './src/routes/api.routes.js';
-import pool from './src/config/database.js';
+import pool from './src/config/database.config.js';
 import { errorRes } from './src/middlewares/error.middleware.js';
-import { ansi } from './src/utils/ansi.js';
+import { ansi } from './src/utils/ansi.util.js';
 
 const app = express();
 const ENV = (process.env.NODE_ENV || 'development').toLowerCase();

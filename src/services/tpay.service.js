@@ -1,4 +1,4 @@
-import { newError } from '../utils/newError.js';
+import { newError } from '../utils/newError.util.js';
 
 // Funkcja do pobierania tokena dostępu z API tpay
 export async function getAccessToken() {

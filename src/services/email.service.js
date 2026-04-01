@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { newError } from '../utils/newError.js';
+import { newError } from '../utils/newError.util.js';
 
 // Konfiguracja transportera nodemailer do wysyłania e-maili
 const transporter = nodemailer.createTransport({

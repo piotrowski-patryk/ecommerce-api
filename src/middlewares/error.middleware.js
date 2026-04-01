@@ -1,5 +1,5 @@
 import { ERROR_MESSAGES } from '../utils/errors.js';
-import { ansi } from '../utils/ansi.js';
+import { ansi } from '../utils/ansi.util.js';
 
 // Middleware do obsługi błędów - loguje szczegóły błędu i zwraca odpowiedź JSON
 export function errorRes(error, req, res, next) {

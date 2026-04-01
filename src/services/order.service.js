@@ -1,7 +1,7 @@
-import pool from '../config/database.js';
+import pool from '../config/database.config.js';
 import * as tpayService from './tpay.service.js';
 import * as emailService from './email.service.js';
-import { newError } from '../utils/newError.js';
+import { newError } from '../utils/newError.util.js';
 
 // Funkcja do tworzenia nowego zamówienia w bazie danych i generowania linku do płatności tpay
 export async function create(name, email, items) {

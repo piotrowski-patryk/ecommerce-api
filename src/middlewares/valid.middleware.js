@@ -1,5 +1,5 @@
-import { newError } from '../utils/newError.js';
-import { regex } from '../utils/regex.js';
+import { newError } from '../utils/newError.util.js';
+import { regex } from '../utils/regex.util.js';
 
 // Middleware do walidacji pola email - musi być poprawnym adresem e-mail
 export function email(req, res, next) {
