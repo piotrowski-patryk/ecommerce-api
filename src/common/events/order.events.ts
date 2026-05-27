@@ -1,0 +1,3 @@
+export const ORDER_EVENTS = {
+    ORDER_UPDATED: 'ORDER_UPDATED',
+};

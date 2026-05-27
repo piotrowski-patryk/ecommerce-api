@@ -1,0 +1,1 @@
+import './order-updated.listener.js';

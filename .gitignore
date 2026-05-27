@@ -1,7 +1,14 @@
 # Dependencies
 node_modules/
-dist/
 oh-my-zsh/
+
+# Build outputs
+dist/
+
+# Prisma Specific
+/src/generated/prisma
+*.db
+*.db-journal
 
 # Environment variables (CRITICAL: Never commit these!)
 .env
@@ -9,6 +16,7 @@ oh-my-zsh/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.backup
 
 # Debug logs
 npm-debug.log*
@@ -31,6 +39,6 @@ logs/
 Thumbs.db
 
 # Database
-# If you ever export your DB to a file in this folder
 *.sql
 !schema.sql
+/src/generated/prisma

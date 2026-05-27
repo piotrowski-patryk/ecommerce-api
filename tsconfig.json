@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    /* Podstawowe opcje */
+    "target": "es2022",
+    "lib": ["es2022"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "jsx": "react-jsx",
+    
+    /* System plików i ścieżek */
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "paths": {
+      "#/*": ["./src/*"]
+    },
+    
+    /* Sprawdzanie typów i bezpieczeństwo */
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    /* Ochrona kodu źródłowego */
+    "removeComments": true,
+    "sourceMap": false,
+    "declaration": false,
+    
+    /* Kompatybilność i moduły */
+    "esModuleInterop": true,
+    "types": ["node"]
+  },
+  "include": ["./src/**/*"]
+}

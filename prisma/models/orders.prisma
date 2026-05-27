@@ -1,0 +1,17 @@
+model Order {
+  id         String        @id @default(uuid())
+  publicId   Int           @unique @default(autoincrement()) @map("public_id")
+  currency   String        @default("PLN")
+  totalNet   Decimal       @default(0.00) @map("total_net") @db.Decimal(10, 2)
+  totalGross Decimal       @default(0.00) @map("total_gross") @db.Decimal(10, 2)
+  totalTax   Decimal       @default(0.00) @map("total_tax") @db.Decimal(10, 2)
+  totalPaid  Decimal       @default(0.00) @map("total_paid") @db.Decimal(10, 2)
+  status     String        @default("PENDING")
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+  clients    OrderClient[]
+  items      OrderItem[]
+  payments   Payment[]
+
+  @@map("orders")
+}

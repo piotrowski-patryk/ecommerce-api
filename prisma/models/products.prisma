@@ -1,0 +1,14 @@
+model Product {
+  id         String      @id @default(uuid())
+  name       String      @db.VarChar(255)
+  currency   String      @default("PLN")
+  priceNet   Decimal     @map("price_net") @db.Decimal(10, 2)
+  priceGross Decimal     @map("price_gross") @db.Decimal(10, 2)
+  vatRate    Int         @map("vat_rate")
+  status     String      @default("DRAFT")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  orderItems OrderItem[]
+
+  @@map("products")
+}
