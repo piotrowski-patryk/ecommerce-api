@@ -38,8 +38,8 @@ export async function createTransaction({amount, currency, orderPublicId, paymen
                 },
                 callbacks: {
                     payerUrls: {
-                        success: config.client.paths.payments.success,
-                        error: config.client.paths.payments.error
+                        success: config.web.paths.payments.success,
+                        error: config.web.paths.payments.error
                     },
                     notification: {
                         url: `${config.app.url}/api/payments/webhook-tpay`
