@@ -1,9 +1,9 @@
 export const web = {
-    protocol: process.env.WEBT_PROTOCOL,
-    hostname: process.env.WEBT_HOSTNAME,
-    port: process.env.WEBT_PORT,
+    protocol: process.env.WEB_PROTOCOL,
+    hostname: process.env.WEB_HOSTNAME,
+    port: process.env.WEB_PORT,
 
-    url: `${process.env.WEBT_PROTOCOL}://${process.env.WEBT_HOSTNAME}${process.env.WEBT_HOSTNAME === 'localhost' ? `:${process.env.WEBT_PORT}` : ''}`,
+    url: `${process.env.WEB_PROTOCOL}://${process.env.WEB_HOSTNAME}${process.env.WEB_HOSTNAME === 'localhost' ? `:${process.env.WEB_PORT}` : ''}`,
 
     paths: {
         payments: {
