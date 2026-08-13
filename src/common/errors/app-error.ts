@@ -1,22 +1,22 @@
-import { ERROR_CODES } from "./error-codes.js";
+import { ERROR_CODES, type ErrorCode } from './error-codes.js'
 
 export class AppError extends Error {
-    
-    code: string;
-    status: number;
-    details: any;
-    trusted: boolean;
+  code: ErrorCode
+  status: number
+  details: unknown
 
-    constructor(code: string, details: any = null) {
-        const errorConfig = ERROR_CODES[code] || ERROR_CODES.INTERNAL_SERVER_ERROR;
+  constructor(
+    code: ErrorCode,
+    details: unknown = null,
+  ) {
+    const errorConfig = ERROR_CODES[code]
 
-        super(errorConfig.message);
+    super(errorConfig.message)
 
-        this.code = code || 'INTERNAL_SERVER_ERROR';
-        this.status = errorConfig.status;
-        this.details = details;
-        this.trusted = true;
-
-        Error.captureStackTrace(this, this.constructor);
-    }
+    this.name = 'AppError'
+    this.code = code
+    this.status = errorConfig.status
+    this.details = details
+    Error.captureStackTrace(this, this.constructor)
+  }
 }

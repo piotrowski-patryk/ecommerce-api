@@ -1,53 +1,46 @@
-import { AppError } from '#/common/errors/index.js';
-import repositories from '../repositories/index.js';
-import event from '#/common/events/index.js';
+import { AppError } from '#/common/errors/index.js'
+import event from '#/common/events/index.js'
 
-export type In = {
+import { findById, update } from '../repositories/payments.repository.js'
+
+export type UpdatePaymentInput = {
     id: string;
     paid: number;
     cancelled: boolean;
 };
 
-export async function updatePayment({id, paid, cancelled}: In): Promise<void> {
-
-    // Pobieranie rekordu z bazy danych
-    const payment = await repositories.payments.findById(id);
+export async function updatePayment({ id, paid, cancelled }: UpdatePaymentInput): Promise<void> {
+    const payment = await findById(id)
 
     if (!payment) {
-        throw new AppError('NOT_FOUND');
+        throw new AppError('NOT_FOUND')
     }
 
     const amount = payment.amount.toNumber();
 
-    // Ustawienie statusu
-    let status = 'FAILED';
+    const status = cancelled
+      ? 'CANCELLED'
+      : paid < amount
+        ? 'PARTIAL'
+        : paid === amount
+          ? 'PAID'
+          : 'OVERPAID'
 
-    if (!cancelled) {
-        if (paid < amount) status = 'PARTIAL';
-        if (paid === amount) status = 'PAID';
-        if (paid > amount) status = 'OVERPAID';
-
-    } else {
-        status = 'CANCELLED';
-    }
-
-    // Aktualizacja rekordu w bazie danych
-    const updatePayment = await repositories.payments.update(id, {
+    const updatedPayment = await update(id, {
         paid, status
     });
 
-    if (!updatePayment) {
-        throw new AppError('NOT_FOUND');
+    if (!updatedPayment) {
+        throw new AppError('NOT_FOUND')
     }
 
-    // Informowanie 'orders' o aktualizacji statusu płatności
     event.emit('PAYMENT_UPDATED', { 
         orderId: payment.orderId,
         status,
         summary: {
             currency: payment.currency,
             amount: payment.amount,
-            paid: paid
-        }
-    });
+            paid,
+        },
+    })
 }

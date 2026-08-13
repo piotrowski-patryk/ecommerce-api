@@ -1,21 +1,29 @@
-import event from '#/common/events/index.js';
-import { send } from '../services/send-email.service.js';
-import orders from '#/modules/orders/index.js';
+import event from '#/common/events/index.js'
+import { getOrder } from '#/modules/orders/index.js'
 
-event.on('ORDER_UPDATED', async (data: any) => {
-    const { orderId, status } = data.payload;
+import { sendOrderConfirmation } from '../services/send-email.service.js'
+
+event.on('ORDER_UPDATED', async ({ payload }) => {
+    const { orderId, status } = payload as { orderId: string; status: string }
 
     if (status === 'PAID') {
-        const order = await orders.get(orderId);
+        const order = await getOrder(orderId)
+        const recipient = order.clients[0]?.email
 
-        send('patryk.piotrows@gmail.com', {
-            code: 'ORDER_CONFIRM',
-            data: {
-                number: order.publicId,
-                currency: order.currency,
-                amount: order.totalGross,
-                items: order.items
-            }
+        if (!recipient) {
+            return
+        }
+
+        await sendOrderConfirmation(recipient, {
+            number: order.publicId,
+            currency: order.currency,
+            amount: Number(order.totalGross),
+            items: order.items.map(item => ({
+              id: item.id,
+              name: item.name,
+              quantity: item.quantity,
+              priceGross: Number(item.priceGross),
+            })),
         })
     }
-});
+})

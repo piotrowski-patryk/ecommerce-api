@@ -1,52 +1,27 @@
-import { Request, Response, NextFunction } from 'express';
-import { AppError } from '#/common/errors/index.js';
-import { createOrder } from '../services/create-order.service.js';
+import type { Request, Response } from 'express'
+import { z } from 'zod'
 
-type InClient = {
-    name: string;
-    email: string;
-};
+import { parseInput } from '#/common/validation/parse-input.js'
 
-type InItem = {
-    productId: string;
-    quantity: number;
-};
+import { createOrder } from '../services/create-order.service.js'
 
-type In = {
-    client: InClient;
-    items: InItem[];
-};
+const createOrderSchema = z.object({
+  client: z.object({
+    name: z.string().trim().min(1).max(255),
+    email: z.email(),
+  }),
+  items: z.array(z.object({
+    productId: z.string().uuid(),
+    quantity: z.number().int().positive(),
+  })).min(1),
+})
 
-type Out = {
-    success: boolean;
-    data: {
-        paymentUrl: string;
-    };
-}
+export async function initOrder(req: Request, res: Response) {
+  const input = parseInput(createOrderSchema, req.body)
+  const result = await createOrder(input)
 
-export async function initOrder(req: Request, res: Response, next: NextFunction) {
-
-    const { client, items } = req.body as In;
-    
-    if (!client?.name || !client?.email ||!Array.isArray(items) || items.length === 0) {
-        throw new AppError('INVALID_LOGIC_PARAMETERS', {
-            expected: {
-                client: { name: 'string', email: 'string' },
-                items: 'non-empty array'
-            },
-            received: { client, items }
-        });
-    }
-
-    try {
-        const result = await createOrder({ client, items });
-
-        res.status(201).json({
-            success: true,
-            data: result
-        } as Out);
-
-    } catch (error: any) {
-        next(error);
-    }
+  res.status(201).json({
+    success: true,
+    data: result,
+  })
 }

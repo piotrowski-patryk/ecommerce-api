@@ -1,10 +1,13 @@
-import repositories from '../repositories/index.js';
+import { AppError } from '#/common/errors/index.js'
+
+import { findById } from '../repositories/orders.repository.js'
 
 export async function getOrder(orderId: string) {
-    try {
-        return await repositories.orders.findById(orderId);
+    const order = await findById(orderId)
 
-    } catch (error) {
-        throw error;
+    if (!order) {
+        throw new AppError('NOT_FOUND')
     }
+
+    return order
 }

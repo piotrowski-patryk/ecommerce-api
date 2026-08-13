@@ -1,31 +1,42 @@
-import { AppError } from '../../../common/errors/index.js';
-import repositories from '../repositories/index.js';
-import event from '#/common/events/index.js';
+import { AppError } from '#/common/errors/index.js'
+import event from '#/common/events/index.js'
 
-type In = {
+import { update } from '../repositories/orders.repository.js'
+
+type UpdateOrderStatusInput = {
     orderId: string;
     paid: number;
-    status: 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED';
+    status: string
 }
 
-export async function updateStatus({ orderId, paid, status }: In): Promise<void> {
+export async function updateStatus({ orderId, paid, status }: UpdateOrderStatusInput): Promise<void> {
 
     if (!orderId || paid === undefined || !status) {
-        throw new AppError('INVALID_LOGIC_PARAMETERS');
+        throw new AppError('UNPROCESSABLE_ENTITY')
     }
 
     try {
-        await repositories.orders.update(orderId, {
+        await update(orderId, {
             totalPaid: paid,
             status
-        });
+        })
 
         event.emit('ORDER_UPDATED', {
             orderId,
             status
-        });
-        
-    } catch (error) {
-        throw error;
+        })
+    } catch (error: unknown) {
+        if (isPrismaNotFoundError(error)) {
+            throw new AppError('NOT_FOUND')
+        }
+
+        throw error
     }
+}
+
+function isPrismaNotFoundError(error: unknown): error is { code: string } {
+  return typeof error === 'object'
+    && error !== null
+    && 'code' in error
+    && error.code === 'P2025'
 }

@@ -1,0 +1,21 @@
+enum CartStatus {
+  ACTIVE
+  CONVERTED
+  EXPIRED
+  ABANDONED
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  sessionId String?    @unique @map("session_id")
+
+  status    CartStatus @default(ACTIVE)
+
+  expiresAt DateTime?  @map("expires_at")
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  items     CartItem[]
+
+  @@map("carts")
+}

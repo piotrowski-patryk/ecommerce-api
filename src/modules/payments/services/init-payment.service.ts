@@ -1,9 +1,10 @@
-import repositories from '../repositories/index.js';
-import tpay from '../providers/tpay/index.js';
-import config from '#/config/index.js';
-import { AppError } from '#/common/errors/index.js';
+import { AppError } from '#/common/errors/index.js'
+import config from '#/config/index.js'
 
-export type In = {
+import tpay from '../providers/tpay/index.js'
+import { create, update } from '../repositories/payments.repository.js'
+
+export type InitializePaymentInput = {
     orderId: string;
     orderPublicId: number;
     currency: string;
@@ -12,49 +13,46 @@ export type In = {
     email: string;
 };
 
-export type Out = {
+export type InitializePaymentResult = {
     paymentUrl: string;
 };
 
-export async function initPayment({ orderId, orderPublicId, currency, amount, name, email }: In): Promise<Out> {    
+export async function initPayment({
+  orderId,
+  orderPublicId,
+  currency,
+  amount,
+  name,
+  email,
+}: InitializePaymentInput): Promise<InitializePaymentResult> {
+  if (!config.tpay.currencies.includes(currency)) {
+    throw new AppError('UNPROCESSABLE_ENTITY')
+  }
 
-    let gateway = tpay;
+  const payment = await create({
+    orderId,
+    provider: tpay.name,
+    currency,
+    amount,
+    status: 'PENDING',
+  })
 
-    if (!config[gateway.name].currencies.includes(currency)) {
-        throw new AppError('CURRENCY_NOT_SUPPORTED');
-    }
+  const gatewayData = await tpay.create({
+    amount,
+    currency,
+    orderPublicId,
+    paymentId: payment.id,
+    name,
+    email,
+  })
 
-    try {
-        // Tworzenie rekordu płatności (lokalna baza)
-        const payment = await repositories.payments.create({
-            orderId,
-            provider: 'tpay',
-            currency,
-            amount,
-            status: 'PENDING'
-        });
+  const updatedPayment = await update(payment.id, {
+    providerId: gatewayData.transactionId,
+  })
 
-        // Inicjalizacja płatności u zewnętrznego dostawcy
-        const gatewayData = await gateway.create({
-            amount,
-            currency,
-            orderPublicId,
-            paymentId: payment.id,
-            name,
-            email
-        });
+  if (!updatedPayment) {
+    throw new AppError('NOT_FOUND')
+  }
 
-        // Aktualizacja rekordu o ID transakcji od dostawcy
-        await repositories.payments.update(payment.id, {
-            providerId: gatewayData.transactionId
-        })
-
-        return { 
-            paymentUrl: gatewayData.transactionPaymentUrl 
-        };
-
-    } catch (error) {
-
-        throw error;
-    }
+  return { paymentUrl: gatewayData.transactionPaymentUrl }
 }

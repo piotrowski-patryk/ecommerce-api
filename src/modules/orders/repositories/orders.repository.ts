@@ -1,7 +1,24 @@
-import database from '#/database/index.js';
+import database from '#/database/index.js'
+
+type CreateOrderInput = {
+  client: { name: string; email: string }
+  items: Array<{
+    productVariantId: string
+    name: string
+    quantity: number
+    currency: string
+    priceNet: number
+    priceGross: number
+    vatRate: number
+  }>
+  currency: string
+  totalNet: number
+  totalGross: number
+  totalTax: number
+}
 
 export async function findById(orderId: string) {
-    return await database.order.findUnique({
+    return database.order.findUnique({
         where: { 
             id: orderId 
         },
@@ -12,16 +29,16 @@ export async function findById(orderId: string) {
     });
 }
 
-export async function create(orderData: any, clientData: any, itemData: any) {
-    return await database.order.create({
+export async function create({ client, items, ...order }: CreateOrderInput) {
+    return database.order.create({
         data: {
-            ...orderData,
+            ...order,
             clients: {
-                create: clientData
+                create: client,
             },
             items: {
-                create: itemData
-            }
+                create: items,
+            },
         },
         include: {
             clients: true,
@@ -30,8 +47,8 @@ export async function create(orderData: any, clientData: any, itemData: any) {
     });
 }
 
-export async function update(orderId: string, data: any) {
-    return await database.order.update({
+export async function update(orderId: string, data: { totalPaid: number; status: string }) {
+    return database.order.update({
         where: { id: orderId },
         data
     });

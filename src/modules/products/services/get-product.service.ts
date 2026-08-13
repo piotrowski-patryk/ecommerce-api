@@ -1,6 +1,10 @@
-import { AppError } from '#/common/errors/index.js';
-import repositories from '../repositories/index.js';
+import { findProduct } from '../repositories/product.repository.js'
 
-export async function getById(id: String) {
-  return await repositories.products.findById(id);
+import type { GetProductInput } from '../types/product.types.js'
+
+export async function getProduct({
+  where,
+  include,
+}: GetProductInput) {
+  return findProduct(where, include)
 }

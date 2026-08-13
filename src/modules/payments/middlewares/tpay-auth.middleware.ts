@@ -1,6 +1,9 @@
 
-import { Request, Response, NextFunction } from 'express';
-import tpay from '../providers/tpay/index.js';
+import type { NextFunction, Request, Response } from 'express'
+
+import { AppError } from '#/common/errors/index.js'
+
+import tpay from '../providers/tpay/index.js'
 
 type In = {
     id: string;
@@ -14,8 +17,8 @@ export function tpayAuth(req: Request, res: Response, next: NextFunction) {
 
     const { id, tr_id, tr_amount, tr_crc, md5sum } = req.body as In;
 
-    if ( !id || !tr_id || !tr_amount || !tr_crc || !md5sum ) {
-        return res.status(200).send('TRUE');
+    if (!id || !tr_id || !tr_amount || !tr_crc || !md5sum || !Number.isFinite(Number(tr_amount))) {
+        return res.status(200).send('TRUE')
     }
 
     try {
@@ -27,13 +30,13 @@ export function tpayAuth(req: Request, res: Response, next: NextFunction) {
             signature: md5sum
         });
 
-        next();
+        next()
 
-    } catch (error: any) {
-        if (error.status < 500) {
-            return res.status(200).send('TRUE');
+    } catch (error: unknown) {
+        if (error instanceof AppError && error.status < 500) {
+            return res.status(200).send('TRUE')
         }
 
-        next(error);
+        next(error)
     }
 }

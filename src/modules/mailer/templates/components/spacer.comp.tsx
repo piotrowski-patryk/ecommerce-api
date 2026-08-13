@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Section } from '@react-email/components';
 import style from '../styles/index.js';
 
-export default function Spaceing() {
+export default function Spacer() {
   return (
     <Section style={s.section}></Section>
   );

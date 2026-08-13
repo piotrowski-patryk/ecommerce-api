@@ -1,5 +1,5 @@
-import config from '#/config/index.js';
-import { AppError } from '#/common/errors/index.js';
+import config from '#/config/index.js'
+import { AppError } from '#/common/errors/index.js'
 
 export type In = {
     amount: number;
@@ -16,11 +16,13 @@ export type Out = {
     transactionPaymentUrl: string;
 };
 
-export async function createTransaction({amount, currency, orderPublicId, paymentId, name, email}: In): Promise<Out> {
+export async function createTransaction({ amount, currency, orderPublicId, paymentId, name, email }: In): Promise<Out> {
+    if (!config.tpay.clientId || !config.tpay.secret) {
+        throw new AppError('INTERNAL_SERVER_ERROR')
+    }
 
     try {
-        const auth = Buffer.from(`${config.tpay.clientId}:${config.tpay.secret}`).toString('base64');
-
+        const auth = Buffer.from(`${config.tpay.clientId}:${config.tpay.secret}`).toString('base64')
         const response = await fetch(`${config.tpay.tpayUrl}/transactions`, {
             method: 'POST',
             headers: {
@@ -48,15 +50,19 @@ export async function createTransaction({amount, currency, orderPublicId, paymen
             })
         });
 
-        const responseData = await response.json();
+        const responseData: unknown = await response.json()
 
         if (!response.ok) {
-            throw new AppError('PAYMENT_GATEWAY_ERROR', responseData);
+            throw new AppError('BAD_GATEWAY', responseData)
         }
 
-        return responseData as Out;
+        return responseData as Out
 
-    } catch (error) {
-        throw error;
+    } catch (error: unknown) {
+        if (error instanceof AppError) {
+            throw error
+        }
+
+        throw new AppError('BAD_GATEWAY')
     }
 }

@@ -1,0 +1,29 @@
+enum VariantStatus {
+  AVAILABLE
+  OUT_OF_STOCK
+  DISCONTINUED
+}
+
+model ProductVariant {
+  id            String        @id @default(uuid())
+  publicId      String        @unique @default(nanoid(8)) @map("public_id") @db.VarChar(8)
+  productId     String        @map("product_id")
+  product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  sku           String        @unique @db.VarChar(50)
+  slug          String        @unique @db.VarChar(255)
+  name          String        @db.VarChar(255)
+  stock         Int           @default(0)
+  status        VariantStatus @default(AVAILABLE)
+
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  prices        ProductPrice[]
+  attributes    ProductAttribute[]
+  images        ProductImage[]
+  items         OrderItem[]
+  cartItems     CartItem[]
+
+  @@map("product_variants")
+}

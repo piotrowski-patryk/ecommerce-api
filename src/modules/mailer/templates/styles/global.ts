@@ -17,7 +17,7 @@ export const global = {
         fontSize: theme.fontSize.xl,
         fontWeight: 'bold',
         color: theme.color.primary,
-        textAlign: 'center'
+        textAlign: 'center' as const
     },
     
     h2: { 

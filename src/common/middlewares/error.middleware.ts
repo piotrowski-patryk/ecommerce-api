@@ -1,24 +1,22 @@
-import { Request, Response } from 'express';
+import type { ErrorRequestHandler } from 'express'
+import { AppError, ERROR_CODES } from '../errors/index.js'
 
-export function errorHandler (err: any, req: Request, res: Response) {
-    
-    const status = err.status || 500;
-    const code = err.trusted ? err.code : 'INTERNAL_SERVER_ERROR';
-    const message = err.trusted ? err.message : 'An unexpected error occurred. Please try again later.';
+export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+    const code = err instanceof AppError ? err.code : 'INTERNAL_SERVER_ERROR'
+    const errorConfig = ERROR_CODES[code]
+    const isDevelopment = process.env.NODE_ENV === 'development'
 
-    const isDev = process.env.NODE_ENV === 'development';
-
-    res.status(status).json({
+    res.status(errorConfig.status).json({
         success: false,
         error: {
-            status,
+            status: errorConfig.status,
             code,
-            message,
+            message: errorConfig.message,
             timestamp: new Date().toISOString(),
-            ...(isDev && { 
-                details: err.details || null,
-                stack: err.stack || null,
-            })
-        }
-    });
+            ...(isDevelopment && {
+                details: err instanceof AppError ? err.details : null,
+                stack: err instanceof Error ? err.stack : null,
+            }),
+        },
+    })
 }

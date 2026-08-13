@@ -1,7 +1,4 @@
-import router from './routes.js';
-import { getProducts } from "./services/get-products.service.js";
+export { default as router } from './routes.js'
 
-export default {
-    router,
-    get: getProducts,
-}
+export { getProduct } from './services/get-product.service.js';
+export { getProducts } from './services/get-products.service.js';

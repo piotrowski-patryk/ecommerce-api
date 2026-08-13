@@ -14,21 +14,23 @@
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "dev:email": "email dev --dir src/modules/mailer/templates",
-    "dev:seed": "tsx prisma/seed.ts"
+    "dev:seed": "tsx prisma/seed/seed.ts"
   },
   "dependencies": {
-    "@prisma/adapter-mariadb": "^7.8.0",
+    "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.8.0",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.0.8",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mariadb": "^3.5.2",
-    "nodemailer": "^8.0.7"
+    "nodemailer": "^8.0.7",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@react-email/ui": "^6.1.5",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.8.0",

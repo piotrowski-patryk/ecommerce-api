@@ -3,11 +3,18 @@ import Main from '../layouts/main.layout.js';
 import Hero from '../components/hero.comp.js';
 import Divider from '../components/divider.comp.js';
 import Text from '../components/text.comp.js';
-import Spaceing from '../components/spaceing.comp.js';
+import Spacer from '../components/spacer.comp.js';
 import ProductTable from '../components/product-table.comp.js';
 import Content from '../components/content.comp.js';
 
-export default function OrderConfirm(data) {
+interface OrderConfirmProps {
+  number: number
+  currency: string
+  amount: number
+  items: Array<{ id: string; name: string; quantity: number; priceGross: number }>
+}
+
+export default function OrderConfirm(data: OrderConfirmProps) {
 
   return (
     <Main>
@@ -22,7 +29,7 @@ export default function OrderConfirm(data) {
         content="Dziękujemy za zakup! Wkrótce otrzymasz informację o postępie zamówienia."
       />
 
-      <Spaceing />
+      <Spacer />
 
       <ProductTable
         currency={ data.currency }

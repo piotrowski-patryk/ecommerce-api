@@ -1,79 +1,95 @@
-import repositories from '../repositories/index.js';
-import products from '#/modules/products/index.js';
-import payments from '#/modules/payments/index.js';
-import { AppError } from '#/common/errors/index.js';
+import { AppError } from '#/common/errors/index.js'
+import { getProducts } from '#/modules/products/index.js'
+import { initPayment } from '#/modules/payments/index.js'
 
-type InClient = {
-    name: string;
-    email: string;
-};
+import { create as createOrderRecord } from '../repositories/orders.repository.js'
 
-type InItem = {
-    productId: string;
-    quantity: number;
+type OrderClientInput = {
+  name: string
+  email: string
+}
 
-    name?: string;
-    currency?: string;
-    priceNet?: number;
-    priceGross?: number;
-    vatRate?: number;
-};
+type OrderItemInput = {
+  // Kept for API compatibility; the value identifies a product variant.
+  productId: string
+  quantity: number
+}
 
-type In = {
-    client: InClient;
-    items: InItem[];
-};
+type CreateOrderInput = {
+  client: OrderClientInput
+  items: OrderItemInput[]
+}
 
-export async function createOrder({ client, items }: In) {
+export async function createOrder({ client, items }: CreateOrderInput) {
+  const variantIds = items.map(item => item.productId)
+  const products = await getProducts({
+    where: { variantIds },
+    include: { prices: true },
+  })
 
-    try {
-        const subset = await products.get(items.map(item => item.productId));
+  const variants = new Map(
+    products.flatMap(product => product.variants).map(variant => [variant.id, variant]),
+  )
 
-        let totalNet = 0;
-        let totalGross = 0;
+  let totalNet = 0
+  let totalGross = 0
+  let currency: string | undefined
+  const orderItems = items.map(item => {
+    const variant = variants.get(item.productId)
 
-        for (const item of items) {
-            const product = subset.find(p => p.id === item.productId)!;
-
-            if (product.status !== 'AVAILABLE') {
-                throw new AppError('PRODUCT_NOT_AVAILABLE');
-            }
-
-            item.name = product.name;
-            item.currency = product.currency;
-            item.priceNet = Number(product.priceNet);
-            item.priceGross = Number(product.priceGross);
-            item.vatRate = Number(product.vatRate);
-
-            totalNet += item.priceNet * item.quantity;
-            totalGross += item.priceGross * item.quantity;
-        }
-
-        const orderPayload = {
-            totalNet: totalNet,
-            totalGross: totalGross,
-            totalTax: totalGross - totalNet,
-            status: 'PENDING'
-        }
-
-        // Tworznie zamówienia w bazie danych (razme z klientem i pozycjami)
-        const order = await repositories.orders.create(orderPayload, client, items);
-
-        // Wywołanie płatności
-        const payment = await payments.init({
-            orderId: order.id,
-            orderPublicId: order.publicId,
-            currency: subset[0].currency,
-            amount: Number(order.totalGross),
-            name: client.name,
-            email: client.email
-        });
-
-        return {
-            paymentUrl: payment.paymentUrl
-        }
-
-    } catch (error: any) {
-        throw error;
+    if (!variant || variant.status !== 'AVAILABLE') {
+      throw new AppError('NOT_FOUND')
     }
+
+    if (item.quantity > variant.stock) {
+      throw new AppError('CONFLICT')
+    }
+
+    const price = variant.prices.find(price => price.type === 'PROMOTION')
+      ?? variant.prices.find(price => price.type === 'REGULAR')
+
+    if (!price) {
+      throw new AppError('CONFLICT')
+    }
+
+    if (currency && currency !== price.currency) {
+      throw new AppError('UNPROCESSABLE_ENTITY')
+    }
+
+    currency = price.currency
+    const priceNet = Number(price.priceNet)
+    const vatRate = Number(price.vatRate)
+    const priceGross = priceNet * (1 + vatRate)
+
+    totalNet += priceNet * item.quantity
+    totalGross += priceGross * item.quantity
+
+    return {
+      productVariantId: variant.id,
+      name: variant.name,
+      quantity: item.quantity,
+      currency: price.currency,
+      priceNet,
+      priceGross,
+      vatRate: Math.round(vatRate * 100),
+    }
+  })
+
+  const order = await createOrderRecord({
+    client,
+    items: orderItems,
+    currency: currency ?? 'PLN',
+    totalNet,
+    totalGross,
+    totalTax: totalGross - totalNet,
+  })
+
+  return initPayment({
+    orderId: order.id,
+    orderPublicId: order.publicId,
+    currency: order.currency,
+    amount: Number(order.totalGross),
+    name: client.name,
+    email: client.email,
+  })
 }

@@ -1,5 +1,1 @@
-import { prisma } from './client.js';
-
-export default {
-    ...prisma
-}
+export { prisma as default } from './client.js'

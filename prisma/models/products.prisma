@@ -1,14 +1,23 @@
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+  ARCHIVED
+}
+
 model Product {
-  id         String      @id @default(uuid())
-  name       String      @db.VarChar(255)
-  currency   String      @default("PLN")
-  priceNet   Decimal     @map("price_net") @db.Decimal(10, 2)
-  priceGross Decimal     @map("price_gross") @db.Decimal(10, 2)
-  vatRate    Int         @map("vat_rate")
-  status     String      @default("DRAFT")
-  createdAt  DateTime    @default(now()) @map("created_at")
-  updatedAt  DateTime    @updatedAt @map("updated_at")
-  orderItems OrderItem[]
+  id         String        @id @default(uuid())
+  publicId   String        @unique @default(nanoid(8)) @map("public_id") @db.VarChar(8)
+
+  name       String        @db.VarChar(255)
+  status     ProductStatus @default(DRAFT)
+
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+
+  variants   ProductVariant[]
+  attributes ProductAttribute[]
+  images     ProductImage[]
 
   @@map("products")
 }

@@ -1,6 +1,6 @@
 # 🛒 E-commerce API
 
-An Express backend application designed to handle e-commerce processes. The system manages the order lifecycle within a MySQL database and integrates the Tpay external payment gateway.
+An Express backend application designed to handle e-commerce processes. The system manages the order lifecycle in PostgreSQL and integrates the Tpay payment gateway.
 
 <br>
 
@@ -51,7 +51,7 @@ npm run dev
 ## 🔌 API Endpoints
 
 > [!NOTE]
-> **POST:** `/api/order/`<br>
+> **POST:** `/api/orders`<br>
 > **Description:** `Adds the order to the database and returns a payment link.`
 >
 > <details>
@@ -60,13 +60,13 @@ npm run dev
 >
 > ```json
 > {
->     "customer": {
+>     "client": {
 >         "name": "John Doe",
 >         "email": "client@example.com",
 >     },
 >     "items": [
->         { "id": 1, "quantity": 1 },
->         { "id": 2, "quantity": 13 }
+>         { "productId": "product-variant-uuid", "quantity": 1 },
+>         { "productId": "another-product-variant-uuid", "quantity": 13 }
 >     ]
 > }
 > ```
@@ -80,7 +80,7 @@ npm run dev
 > {
 >     "success": true,
 >     "data": {
->         "paymentLink": "[https://secure.example.com/payment/TR-XXXX-XXXXX](https://secure.example.com/payment/TR-XXXX-XXXXX)"
+>         "paymentUrl": "https://secure.example.com/payment/TR-XXXX-XXXXX"
 >     }
 > }
 > ```
@@ -89,7 +89,7 @@ npm run dev
 <br>
 
 > [!NOTE]
-> **POST:** `/api/order/webhook-tpay`<br>
+> **POST:** `/api/payments/webhook-tpay`<br>
 > **Description:** `It retrieves the payment confirmation message from Tpay and updates the order status in the database.`
 >
 > <details>
@@ -115,13 +115,11 @@ The API uses standard HTTP status codes. Common error responses:
 
 | Status | Error Code | Description |
 | :---: | :--- | :--- |
-| 400 | `INVALID_ARGUMENT` | The provided argument or parameter is invalid, unrecognized, or out of range. |
-| 400 | `INVALID_PAYMENT_GATEWAY` | The selected payment gateway is invalid or not supported. |
-| 401 | `AUTHENTICATION_FAILED` | The request could not be authenticated. Please check your credentials. |
-| 404 | `NOT_FOUND` | The requested resource was not found. |
-| 409 | `PRODUCT_NOT_AVAILABLE` | The requested product is currently inactive or unavailable for purchase. |
-| 422 | `INVALID_LOGIC_PARAMETERS` | The provided parameters are invalid for this operation. |
-| 422 | `CURRENCY_NOT_SUPPORTED` | The specified currency is not supported for this operation. |
-| 500 | `INTERNAL_SERVER_ERROR` | An unexpected error occurred. Please try again later. |
-| 500 | `CONFIGURATION_ERROR` | The server configuration is invalid or missing required keys. |
-| 502 | `PAYMENT_GATEWAY_ERROR` | Payment gateway connection error. Please try again later. |
+| 400 | `BAD_REQUEST` | Bad Request |
+| 401 | `UNAUTHORIZED` | Unauthorized |
+| 403 | `FORBIDDEN` | Forbidden |
+| 404 | `NOT_FOUND` | Not Found |
+| 409 | `CONFLICT` | Conflict |
+| 422 | `UNPROCESSABLE_ENTITY` | Unprocessable Entity |
+| 500 | `INTERNAL_SERVER_ERROR` | Internal Server Error |
+| 502 | `BAD_GATEWAY` | Bad Gateway |

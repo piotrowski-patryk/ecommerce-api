@@ -15,7 +15,7 @@ export function authentication({merchantId, providerId, amount, paymentId, signa
     const security = config.tpay.security;
 
     if (!security) {
-        throw new AppError('CONFIGURATION_ERROR');
+        throw new AppError('INTERNAL_SERVER_ERROR');
     }
 
     const payload = `${merchantId}${providerId}${Number(amount).toFixed(2)}${paymentId}${security}`;
@@ -25,6 +25,6 @@ export function authentication({merchantId, providerId, amount, paymentId, signa
     const signatureBuffer = Buffer.from(signature, 'utf-8');
 
     if (hashBuffer.length !== signatureBuffer.length || !crypto.timingSafeEqual(hashBuffer, signatureBuffer)) {
-        throw new AppError('AUTHENTICATION_FAILED');
+        throw new AppError('UNAUTHORIZED');
     }
 }

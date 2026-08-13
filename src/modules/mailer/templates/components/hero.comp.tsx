@@ -17,6 +17,6 @@ const s = {
   p: {
     fontSize: style.theme.fontSize.base,
     color: style.theme.color.secondary,
-    textAlign: 'center'
+    textAlign: 'center' as const
   }
 };

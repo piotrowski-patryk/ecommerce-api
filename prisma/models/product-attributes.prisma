@@ -1,0 +1,14 @@
+model ProductAttribute {
+  id               String         @id @default(uuid())
+
+  productId        String?         @map("product_id")
+  product          Product?        @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  productVariantId String?         @map("product_variant_id")
+  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+
+  attributeValueId String          @map("attribute_value_id")
+  attributeValue   AttributeValue @relation(fields: [attributeValueId], references: [id], onDelete: Cascade)
+
+  @@map("product_attributes")
+}

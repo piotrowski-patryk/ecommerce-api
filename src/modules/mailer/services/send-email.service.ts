@@ -1,33 +1,32 @@
-import { AppError } from "#/common/errors/index.js";
-import { transporter } from "../providers/nodemailer.provider.js";
-import config from "#/config/index.js";
-import { render } from '@react-email/render';
-import templates from "../templates/index.js";
-import { EMAIL_CODES } from "../email-codes.constant.js";
+import { render } from '@react-email/render'
 
-export async function send(to: string, options: any) {
+import { AppError } from '#/common/errors/index.js'
+import config from '#/config/index.js'
 
-    if (!to) throw new AppError('INVALID_ARGUMENT');
+import { transporter } from '../providers/nodemailer.provider.js'
+import OrderConfirm from '../templates/views/order-confirm.view.js'
 
-    let subject: string = 'Wiadomość systemowa';
-    let html: string = '';
+export interface OrderConfirmationEmail {
+  number: number
+  currency: string
+  amount: number
+  items: Array<{ id: string; name: string; quantity: number; priceGross: number }>
+}
 
-    // Automatyczna wiadomość na podstawie kodu
-    if (options.code) {
-        subject = EMAIL_CODES[options.code].subject;
-        html = await render(templates[EMAIL_CODES[options.code].template](options.data));
-    }
+export async function sendOrderConfirmation(
+  to: string,
+  data: OrderConfirmationEmail,
+) {
+  if (!to) {
+    throw new AppError('BAD_REQUEST')
+  }
 
-    // Wysyłanie wiadomości za pomocą providera nodemailer
-    try {
-        await transporter.sendMail({
-            from: config.smtp.fromEmail,
-            to,
-            subject,
-            html
-        });
+  const html = await render(OrderConfirm(data))
 
-    } catch (error) {
-        throw error;
-    }
+  await transporter.sendMail({
+    from: config.smtp.fromEmail,
+    to,
+    subject: 'Potwierdzenie zamówienia',
+    html,
+  })
 }

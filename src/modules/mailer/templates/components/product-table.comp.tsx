@@ -18,7 +18,8 @@ interface TableProps {
 
 export default function ProductTable({ currency, amount, items }: TableProps) {
 
-  const symbol = (CURRENCY_CODES as any)[currency].symbol;
+  const currencyDefinition = CURRENCY_CODES[currency as keyof typeof CURRENCY_CODES]
+  const symbol = currencyDefinition?.symbol ?? currency
 
   return (
     <Section style={s.section}>

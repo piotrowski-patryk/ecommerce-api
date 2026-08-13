@@ -1,16 +1,17 @@
 model Payment {
-  id         String   @id @default(uuid())
-  orderId    String   @map("order_id")
-  providerId String?  @unique @map("provider_id")
-  provider   String
-  currency   String   @default("PLN")
-  amount     Decimal  @db.Decimal(10, 2)
-  paid       Decimal  @default(0.00) @db.Decimal(10, 2)
-  status     String   @default("PENDING")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("update_at")
-  order      Order    @relation(fields: [orderId], references: [id])
+  id String @id @default(uuid())
+  orderId String @map("order_id")
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  @@index([orderId], map: "payments_order_id_fkey")
+  providerId String? @unique @map("provider_id")
+  provider   String
+  currency   String  @default("PLN")
+  amount     Decimal @db.Decimal(10, 2)
+  paid       Decimal @default(0.00) @db.Decimal(10, 2)
+  status     String  @default("PENDING")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("update_at")
+
   @@map("payments")
 }

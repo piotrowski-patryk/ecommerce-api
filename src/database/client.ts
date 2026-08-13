@@ -1,14 +1,9 @@
-import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from './generated/client.js';
 import config from '#/config/index.js';
 
-const adapter = new PrismaMariaDb({
-  host: config.database.host,
-  port: Number(config.database.port),
-  user: config.database.user,
-  password: config.database.password,
-  database: config.database.name,
-  connectionLimit: 5,
-});
+const adapter = new PrismaPg({
+  connectionString: config.database.url,
+})
 
 export const prisma = new PrismaClient({ adapter });
