@@ -1,41 +1,42 @@
 export const ERROR_CODES = {
   BAD_REQUEST: {
     status: 400,
-    message: 'Bad Request',
+    message: 'The request is invalid.',
   },
+
   UNAUTHORIZED: {
     status: 401,
-    message: 'Unauthorized',
+    message: 'Authentication is required.',
   },
 
   FORBIDDEN: {
     status: 403,
-    message: 'Forbidden',
+    message: 'You do not have permission to perform this action.',
   },
 
   NOT_FOUND: {
     status: 404,
-    message: 'Not Found',
+    message: 'The requested resource was not found.',
   },
 
   CONFLICT: {
     status: 409,
-    message: 'Conflict',
+    message: 'The request conflicts with the current state of the resource.',
   },
 
   UNPROCESSABLE_ENTITY: {
     status: 422,
-    message: 'Unprocessable Entity',
+    message: 'The request data is invalid.',
   },
 
   INTERNAL_SERVER_ERROR: {
     status: 500,
-    message: 'Internal Server Error',
+    message: 'An unexpected error occurred.',
   },
 
   BAD_GATEWAY: {
     status: 502,
-    message: 'Bad Gateway',
+    message: 'The server received an invalid response from an upstream server.',
   },
 } as const
 
