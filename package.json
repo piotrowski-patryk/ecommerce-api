@@ -46,10 +46,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Xdellta/ecommerce-api.git"
+    "url": "git+https://github.com/piotrowski-patryk/ecommerce-api-v1.git"
   },
   "bugs": {
-    "url": "https://github.com/Xdellta/ecommerce-api/issues"
+    "url": "https://github.com/piotrowski-patryk/ecommerce-api-v1/issues"
   },
-  "homepage": "https://github.com/Xdellta/ecommerce-api#readme"
+  "homepage": "https://github.com/piotrowski-patryk/ecommerce-api-v1#readme"
 }
