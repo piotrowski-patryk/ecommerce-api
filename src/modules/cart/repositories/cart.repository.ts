@@ -4,15 +4,18 @@ export async function createCartWithItem({
   sessionId,
   variantId,
   quantity,
+  expiresAt,
 }: {
   sessionId: string
   variantId: string
   quantity: number
+  expiresAt: Date
 }) {
   return database.cart.create({
     data: {
       sessionId,
       status: 'ACTIVE',
+      expiresAt,
 
       items: {
         create: {
@@ -24,15 +27,22 @@ export async function createCartWithItem({
   })
 }
 
-export async function findCartBySessionId(sessionId: string) {
-  return database.cart.findUnique({
+export async function findCartBySessionId(
+  sessionId: string,
+  now = new Date(),
+) {
+  return database.cart.findFirst({
     where: {
       sessionId,
+      expiresAt: {
+        gt: now,
+      },
     },
 
     select: {
       id: true,
       status: true,
+      expiresAt: true,
 
       items: {
         select: {

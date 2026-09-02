@@ -1,4 +1,5 @@
 import { AppError } from '#/common/errors/index.js'
+import { Prisma } from '#/database/generated/client.js'
 import { getProducts } from '#/modules/products/index.js'
 import { initPayment } from '#/modules/payments/index.js'
 
@@ -24,15 +25,14 @@ export async function createOrder({ client, items }: CreateOrderInput) {
   const variantIds = items.map(item => item.productId)
   const products = await getProducts({
     where: { variantIds },
-    include: { prices: true },
   })
 
   const variants = new Map(
     products.flatMap(product => product.variants).map(variant => [variant.id, variant]),
   )
 
-  let totalNet = 0
-  let totalGross = 0
+  let totalNet = new Prisma.Decimal(0)
+  let totalGross = new Prisma.Decimal(0)
   let currency: string | undefined
   const orderItems = items.map(item => {
     const variant = variants.get(item.productId)
@@ -45,24 +45,19 @@ export async function createOrder({ client, items }: CreateOrderInput) {
       throw new AppError('CONFLICT')
     }
 
-    const price = variant.prices.find(price => price.type === 'PROMOTION')
-      ?? variant.prices.find(price => price.type === 'REGULAR')
-
-    if (!price) {
-      throw new AppError('CONFLICT')
-    }
+    const { price } = variant
 
     if (currency && currency !== price.currency) {
       throw new AppError('UNPROCESSABLE_ENTITY')
     }
 
     currency = price.currency
-    const priceNet = Number(price.priceNet)
-    const vatRate = Number(price.vatRate)
-    const priceGross = priceNet * (1 + vatRate)
+    const priceNet = price.net
+    const priceGross = price.amount
+    const vatRate = price.vatRate.mul(100).toDecimalPlaces(0).toNumber()
 
-    totalNet += priceNet * item.quantity
-    totalGross += priceGross * item.quantity
+    totalNet = totalNet.add(priceNet.mul(item.quantity))
+    totalGross = totalGross.add(priceGross.mul(item.quantity))
 
     return {
       productVariantId: variant.id,
@@ -71,7 +66,7 @@ export async function createOrder({ client, items }: CreateOrderInput) {
       currency: price.currency,
       priceNet,
       priceGross,
-      vatRate: Math.round(vatRate * 100),
+      vatRate,
     }
   })
 
@@ -81,7 +76,7 @@ export async function createOrder({ client, items }: CreateOrderInput) {
     currency: currency ?? 'PLN',
     totalNet,
     totalGross,
-    totalTax: totalGross - totalNet,
+    totalTax: totalGross.sub(totalNet),
   })
 
   return initPayment({

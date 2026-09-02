@@ -4,19 +4,21 @@ import { seedProducts } from './products.js'
 
 async function main() {
   console.log('🔄 Czyszczenie bazy...');
-  await database.productAttribute.deleteMany();
-  await database.productVariant.deleteMany();
-  await database.product.deleteMany();
-  await database.attributeValue.deleteMany();
-  await database.attribute.deleteMany();
 
-  console.log('📚 Seedowanie słowników...');
-  const attributeValues = await seedAttributes();
+  await database.$transaction([
+    database.cart.deleteMany(),
+    database.order.deleteMany(),
+    database.product.deleteMany(),
+    database.attribute.deleteMany(),
+  ])
 
-  console.log('📦 Seedowanie produktów...');
-  await seedProducts(attributeValues);
+  console.log('📚 Seedowanie słowników...')
+  const attributeValues = await seedAttributes()
 
-  console.log('✅ Seedowanie zakończone sukcesem!');
+  console.log('📦 Seedowanie produktów...')
+  await seedProducts(attributeValues)
+
+  console.log('✅ Seedowanie zakończone sukcesem!')
 }
 
 main()

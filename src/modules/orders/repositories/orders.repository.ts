@@ -1,4 +1,5 @@
 import database from '#/database/index.js'
+import type { Prisma } from '#/database/generated/client.js'
 
 type CreateOrderInput = {
   client: { name: string; email: string }
@@ -7,14 +8,14 @@ type CreateOrderInput = {
     name: string
     quantity: number
     currency: string
-    priceNet: number
-    priceGross: number
+    priceNet: Prisma.Decimal
+    priceGross: Prisma.Decimal
     vatRate: number
   }>
   currency: string
-  totalNet: number
-  totalGross: number
-  totalTax: number
+  totalNet: Prisma.Decimal
+  totalGross: Prisma.Decimal
+  totalTax: Prisma.Decimal
 }
 
 export async function findById(orderId: string) {

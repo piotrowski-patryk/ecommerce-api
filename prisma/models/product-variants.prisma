@@ -21,7 +21,7 @@ model ProductVariant {
 
   prices        ProductPrice[]
   attributes    ProductAttribute[]
-  images        ProductImage[]
+  media         ProductMedia[]
   items         OrderItem[]
   cartItems     CartItem[]
 

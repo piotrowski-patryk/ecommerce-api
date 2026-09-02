@@ -2,6 +2,7 @@ import { AppError } from '#/common/errors/index.js'
 import { getProduct } from '#/modules/products/index.js'
 
 import { findItemById, updateItem } from '../repositories/cart-item.repository.js'
+import { getCartExpiration } from '../utils/cart-expiration.js'
 
 interface UpdateCartItemInput {
   id: string
@@ -14,7 +15,8 @@ export async function updateCartItem({
   quantity,
   sessionId,
 }: UpdateCartItemInput) {
-  const item = await findItemById(id, sessionId)
+  const now = new Date()
+  const item = await findItemById(id, sessionId, now)
 
   if (!item) {
     throw new AppError('NOT_FOUND')
@@ -42,7 +44,10 @@ export async function updateCartItem({
 
   await updateItem({
     id: item.id,
+    cartId: item.cartId,
     quantity,
+    expiresAt: getCartExpiration(now),
+    activeAfter: now,
   })
 
   return {

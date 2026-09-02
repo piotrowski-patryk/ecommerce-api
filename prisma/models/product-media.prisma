@@ -1,4 +1,4 @@
-model ProductImage {
+model ProductMedia {
   id               String          @id @default(uuid())
   productId        String?         @map("product_id")
   product          Product?        @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -12,5 +12,5 @@ model ProductImage {
   createdAt        DateTime        @default(now()) @map("created_at")
   updatedAt        DateTime        @updatedAt @map("updated_at")
 
-  @@map("product_images")
+  @@map("product_media")
 }

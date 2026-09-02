@@ -1,16 +1,37 @@
 import database from '#/database/index.js'
+import type { Prisma } from '#/database/generated/client.js'
 
 import type {
   ProductInclude,
   ProductWhere,
 } from '../types/product.types.js'
 
+const priceSelect = {
+  id: true,
+  productVariantId: true,
+  currency: true,
+  priceNet: true,
+  vatRate: true,
+  type: true,
+  status: true,
+  startsAt: true,
+  endsAt: true,
+} as const
+
+const prices = {
+  where: {
+    currency: 'PLN',
+    type: { in: ['REGULAR', 'PROMOTION'] },
+    status: { in: ['ACTIVE', 'ARCHIVED'] },
+  },
+  select: priceSelect,
+  orderBy: { startsAt: 'asc' },
+} satisfies Prisma.ProductVariant$pricesArgs
+
 export async function findProduct(
   where: ProductWhere = {},
   include: ProductInclude = {},
 ) {
-  const now = new Date()
-
   const variantWhere =
     where.variantId
       ? { id: where.variantId }
@@ -62,43 +83,21 @@ export async function findProduct(
           stock: true,
           status: true,
 
-          ...(include.prices && {
-            prices: {
-              where: {
-                status: 'ACTIVE',
-                startsAt: {
-                  lte: now,
-                },
-                OR: [
-                  {
-                    endsAt: null,
-                  },
-                  {
-                    endsAt: {
-                      gte: now,
-                    },
-                  },
-                ],
-              },
+          prices,
 
-              select: {
-                priceNet: true,
-                vatRate: true,
-                currency: true,
-                type: true,
-                status: true,
-                startsAt: true,
-                endsAt: true,
-              },
-            },
-          }),
-
-          ...(include.images && {
-            images: {
+          ...(include.media && {
+            media: {
               select: {
                 url: true,
                 alt: true,
               },
+              orderBy: [
+                { position: 'asc' },
+                { id: 'asc' },
+              ],
+              ...(typeof include.media === 'object'
+                && include.media.limit !== undefined
+                && { take: include.media.limit }),
             },
           }),
 
@@ -128,8 +127,6 @@ export async function findProducts(
   where: ProductWhere = {},
   include: ProductInclude = {},
 ) {
-  const now = new Date()
-
   const variantWhere =
     where.variantIds
       ? {
@@ -207,43 +204,21 @@ export async function findProducts(
           stock: true,
           status: true,
 
-          ...(include.prices && {
-            prices: {
-              where: {
-                status: 'ACTIVE',
-                startsAt: {
-                  lte: now,
-                },
-                OR: [
-                  {
-                    endsAt: null,
-                  },
-                  {
-                    endsAt: {
-                      gte: now,
-                    },
-                  },
-                ],
-              },
+          prices,
 
-              select: {
-                priceNet: true,
-                vatRate: true,
-                currency: true,
-                type: true,
-                status: true,
-                startsAt: true,
-                endsAt: true,
-              },
-            },
-          }),
-
-          ...(include.images && {
-            images: {
+          ...(include.media && {
+            media: {
               select: {
                 url: true,
                 alt: true,
               },
+              orderBy: [
+                { position: 'asc' },
+                { id: 'asc' },
+              ],
+              ...(typeof include.media === 'object'
+                && include.media.limit !== undefined
+                && { take: include.media.limit }),
             },
           }),
 

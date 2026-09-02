@@ -17,7 +17,7 @@ model Product {
 
   variants   ProductVariant[]
   attributes ProductAttribute[]
-  images     ProductImage[]
+  media      ProductMedia[]
 
   @@map("products")
 }

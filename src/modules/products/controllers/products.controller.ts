@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 
 import { AppError } from '#/common/errors/index.js'
 
+import { toProductDto } from '../mappers/product.mapper.js'
 import { getProduct as getProductService } from '../services/get-product.service.js'
 import { getProducts as getProductsService } from '../services/get-products.service.js'
 
@@ -20,8 +21,7 @@ export async function getProduct(
       variantSlug: slug,
     },
     include: {
-      prices: req.query.prices === 'true',
-      images: req.query.images === 'true',
+      media: req.query.media === 'true',
       attributes: req.query.attributes === 'true',
     },
   })
@@ -32,7 +32,7 @@ export async function getProduct(
 
   return res.status(200).json({
     success: true,
-    data: product,
+    data: toProductDto(product),
   })
 }
 
@@ -42,14 +42,13 @@ export async function getProducts(
 ) {
   const products = await getProductsService({
     include: {
-      prices: req.query.prices === 'true',
-      images: req.query.images === 'true',
+      media: req.query.media === 'true',
       attributes: req.query.attributes === 'true',
     },
   })
 
   return res.status(200).json({
     success: true,
-    data: products,
+    data: products.map(product => toProductDto(product)),
   })
 }

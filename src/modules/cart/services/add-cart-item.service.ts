@@ -5,6 +5,7 @@ import { getProduct } from '#/modules/products/index.js'
 
 import { createCartWithItem, findCartBySessionId } from '../repositories/cart.repository.js'
 import { upsertItem } from '../repositories/cart-item.repository.js'
+import { getCartExpiration } from '../utils/cart-expiration.js'
 
 interface AddCartItemInput {
   sessionId?: string
@@ -17,7 +18,9 @@ export async function addCartItem({
   variantId,
   quantity,
 }: AddCartItemInput) {
-  
+  const now = new Date()
+  const expiresAt = getCartExpiration(now)
+
   const product = await getProduct({
     where: {
       variantId,
@@ -41,16 +44,17 @@ export async function addCartItem({
   let cart = null
 
   if (sessionId) {
-    cart = await findCartBySessionId(sessionId)
+    cart = await findCartBySessionId(sessionId, now)
   }
 
-  if (!cart) {
+  if (!sessionId || !cart) {
     const newSessionId = randomUUID()
 
     await createCartWithItem({
       sessionId: newSessionId,
       variantId,
       quantity,
+      expiresAt,
     })
 
     return { sessionId: newSessionId }
@@ -67,6 +71,8 @@ export async function addCartItem({
     cartId: cart.id,
     variantId,
     quantity: finalQuantity,
+    expiresAt,
+    activeAfter: now,
   })
 
   return { sessionId }

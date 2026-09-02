@@ -11,11 +11,12 @@ model Cart {
 
   status    CartStatus @default(ACTIVE)
 
-  expiresAt DateTime?  @map("expires_at")
+  expiresAt DateTime   @default(dbgenerated("(CURRENT_TIMESTAMP + '30 days'::interval)")) @map("expires_at")
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime   @updatedAt @map("updated_at")
 
   items     CartItem[]
 
+  @@index([expiresAt], map: "carts_expires_at_idx")
   @@map("carts")
 }

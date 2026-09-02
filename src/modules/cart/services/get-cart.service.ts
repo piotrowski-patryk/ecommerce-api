@@ -1,6 +1,7 @@
 import { AppError } from '#/common/errors/index.js'
-import { getProducts } from '#/modules/products/index.js'
+import { getProducts, toProductDto } from '#/modules/products/index.js'
 
+import { toCartProductDto } from '../mappers/cart-product.mapper.js'
 import { findCartBySessionId } from '../repositories/cart.repository.js'
 
 interface GetCartInput {
@@ -20,6 +21,7 @@ export async function getCart({ sessionId }: GetCartInput) {
     return {
       id: cart.id,
       status: cart.status,
+      expiresAt: cart.expiresAt,
       items: [],
     }
   }
@@ -30,26 +32,32 @@ export async function getCart({ sessionId }: GetCartInput) {
       variantIds: cart.items.map(item => item.variantId),
     },
     include: {
-      prices: true,
-      images: true,
+      media: {
+        limit: 1,
+      },
     },
   })
 
   // Items
-  const items = cart.items.map(item => ({
-    id: item.id,
-    quantity: item.quantity,
-    product: products.find(product =>
-      product.variants.find(
-        variant => variant.id === item.variantId,
-      ),
-    ),
-  }))
+  const items = cart.items.map(item => {
+    const product = products.find(product =>
+      product.variants.some(variant => variant.id === item.variantId),
+    )
+
+    return {
+      id: item.id,
+      quantity: item.quantity,
+      product: product
+        ? toCartProductDto(toProductDto(product), item.variantId)
+        : undefined,
+    }
+  })
 
   // Response
   return {
     id: cart.id,
     status: cart.status,
+    expiresAt: cart.expiresAt,
     items,
   }
 }

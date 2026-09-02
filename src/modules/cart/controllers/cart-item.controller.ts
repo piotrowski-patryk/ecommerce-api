@@ -7,6 +7,10 @@ import { parseInput } from '#/common/validation/parse-input.js'
 import { addCartItem } from '../services/add-cart-item.service.js'
 import { updateCartItem } from '../services/update-cart-item.service.js'
 import { removeCartItem } from '../services/remove-cart-item.service.js'
+import {
+  CART_COOKIE_NAME,
+  setCartCookie,
+} from '../utils/cart-cookie.js'
 
 export async function add(
   req: Request,
@@ -21,17 +25,13 @@ export async function add(
   )
 
   const result = await addCartItem({
-    sessionId: req.cookies.cart_session_id as string | undefined,
+    sessionId: req.cookies[CART_COOKIE_NAME] as string | undefined,
     variantId,
     quantity,
   })
 
   if (result) {
-    res.cookie('cart_session_id', result.sessionId, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    })
+    setCartCookie(res, result.sessionId)
   }
 
   res.status(200).json({
@@ -48,7 +48,7 @@ export async function update(
     z.object({ quantity: z.number().int().positive() }),
     req.body,
   )
-  const sessionId = req.cookies.cart_session_id as string | undefined
+  const sessionId = req.cookies[CART_COOKIE_NAME] as string | undefined
 
   if (!sessionId) {
     throw new AppError('NOT_FOUND')
@@ -59,6 +59,8 @@ export async function update(
     quantity,
     sessionId,
   })
+
+  setCartCookie(res, sessionId)
 
   res.status(200).json({
     success: true,
@@ -71,7 +73,7 @@ export async function remove(
   res: Response,
 ) {
   const { itemId } = parseInput(z.object({ itemId: z.string().uuid() }), req.params)
-  const sessionId = req.cookies.cart_session_id as string | undefined
+  const sessionId = req.cookies[CART_COOKIE_NAME] as string | undefined
 
   if (!sessionId) {
     throw new AppError('NOT_FOUND')
@@ -81,6 +83,8 @@ export async function remove(
     id: itemId,
     sessionId,
   })
+
+  setCartCookie(res, sessionId)
 
   res.status(204).json({
     success: true,

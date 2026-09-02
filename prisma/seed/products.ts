@@ -6,7 +6,21 @@ type SeededAttributeValue = {
 }
 
 export async function seedProducts(attributeValues: SeededAttributeValue[]) {
-  const getVal = (slug: string) => attributeValues.find(v => v.slug === slug);
+  const attributeValueIds = new Map(
+    attributeValues.map(value => [value.slug, value.id]),
+  )
+  const getAttributeValueId = (slug: string) => {
+    const id = attributeValueIds.get(slug)
+
+    if (!id) {
+      throw new Error(`Missing seeded attribute value: ${slug}`)
+    }
+
+    return id
+  }
+  const now = new Date()
+  const regularStartsAt = new Date(now.getTime() - 45 * 24 * 60 * 60 * 1000)
+  const promoEndsAt = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000)
 
   await database.product.create({
     data: {
@@ -14,9 +28,9 @@ export async function seedProducts(attributeValues: SeededAttributeValue[]) {
       status: 'PUBLISHED',
       attributes: {
         create: [
-          { attributeValueId: getVal('swimer')!.id },
-          { attributeValueId: getVal('polska')!.id }
-        ]
+          { attributeValueId: getAttributeValueId('swimer') },
+          { attributeValueId: getAttributeValueId('polska') },
+        ],
       },
       variants: {
         create: [
@@ -28,18 +42,27 @@ export async function seedProducts(attributeValues: SeededAttributeValue[]) {
             stock: 5,
             status: 'AVAILABLE',
             attributes: {
-              create: [{ attributeValueId: getVal('pojemnosc-2500')!.id }]
+              create: [{
+                attributeValueId: getAttributeValueId('pojemnosc-2500'),
+              }],
             },
-            prices: { 
-              create: { currency: 'PLN', priceNet: 3500.00, vatRate: 0.23, type: 'REGULAR', status: 'ACTIVE' } 
+            prices: {
+              create: {
+                currency: 'PLN',
+                priceNet: 3500,
+                vatRate: 0.23,
+                type: 'REGULAR',
+                status: 'ACTIVE',
+                startsAt: regularStartsAt,
+              },
             },
-            images: {
+            media: {
               create: [
                 { url: 'https://swimer.pl/upload/art/x3353_img1_woda_20000_black_bis_2.jpg.pagespeed.ic.CAwzay3It-.jpg', alt: 'Czarny zbiornik 2500L - przód', position: 0 },
                 { url: 'https://i.imgur.com/bkggTBF.png', alt: 'Czarny zbiornik 2500L - góra', position: 1 },
-                { url: 'https://i.imgur.com/8koTZNB.png', alt: 'Czarny zbiornik 2500L - zawór', position: 2 }
-              ]
-            }
+                { url: 'https://i.imgur.com/8koTZNB.png', alt: 'Czarny zbiornik 2500L - zawór', position: 2 },
+              ],
+            },
           },
           // Wariant 2: 5000L
           {
@@ -49,22 +72,39 @@ export async function seedProducts(attributeValues: SeededAttributeValue[]) {
             stock: 8,
             status: 'AVAILABLE',
             attributes: {
-              create: [{ attributeValueId: getVal('pojemnosc-5000')!.id }]
+              create: [{
+                attributeValueId: getAttributeValueId('pojemnosc-5000'),
+              }],
             },
-            prices: { 
+            prices: {
               create: [
-                { currency: 'PLN', priceNet: 5200.00, vatRate: 0.23, type: 'REGULAR', status: 'ACTIVE' },
-                { currency: 'PLN', priceNet: 4800.00, vatRate: 0.23, type: 'PROMOTION', status: 'ACTIVE' }
-              ]
+                {
+                  currency: 'PLN',
+                  priceNet: 5200,
+                  vatRate: 0.23,
+                  type: 'REGULAR',
+                  status: 'ACTIVE',
+                  startsAt: regularStartsAt,
+                },
+                {
+                  currency: 'PLN',
+                  priceNet: 4800,
+                  vatRate: 0.23,
+                  type: 'PROMOTION',
+                  status: 'ACTIVE',
+                  startsAt: now,
+                  endsAt: promoEndsAt,
+                },
+              ],
             },
-            images: {
+            media: {
               create: [
-                { url: 'https://swimer.pl/upload/art/x3353_img1_woda_20000_black_bis_2.jpg.pagespeed.ic.CAwzay3It-.jpg', alt: 'Czarny zbiornik 5000L - przód', position: 0 }
-              ]
-            }
-          }
-        ]
-      }
-    }
-  });
+                { url: 'https://swimer.pl/upload/art/x3353_img1_woda_20000_black_bis_2.jpg.pagespeed.ic.CAwzay3It-.jpg', alt: 'Czarny zbiornik 5000L - przód', position: 0 },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  })
 }

@@ -29,5 +29,6 @@ model ProductPrice {
   createdAt        DateTime       @default(now()) @map("created_at")
   updatedAt        DateTime       @updatedAt @map("updated_at")
 
+  @@index([productVariantId, currency, type, status, startsAt, endsAt], map: "product_prices_lookup_idx")
   @@map("product_prices")
 }

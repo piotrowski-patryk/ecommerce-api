@@ -14,7 +14,9 @@
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "dev:email": "email dev --dir src/modules/mailer/templates",
-    "dev:seed": "tsx prisma/seed/seed.ts"
+    "dev:seed": "tsx prisma/seed/seed.ts",
+    "test": "node --import tsx --test src/modules/products/mappers/product.mapper.test.ts src/modules/cart/mappers/cart-product.mapper.test.ts src/modules/cart/utils/cart-expiration.test.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",

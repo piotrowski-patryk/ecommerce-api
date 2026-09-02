@@ -51,6 +51,37 @@ npm run dev
 ## 🔌 API Endpoints
 
 > [!NOTE]
+> **GET:** `/api/products/:slug`<br>
+> **Description:** `Returns the product with its current gross price. The price and its history are loaded together with the product. Promotion details are added only while a promotion is active.`
+>
+> ```json
+> {
+>   "success": true,
+>   "data": {
+>     "variants": [
+>       {
+>         "price": {
+>           "amount": "80.00",
+>           "currency": "PLN",
+>           "promo": {
+>             "regular": "100.00",
+>             "lowest30": "90.00",
+>             "endsAt": "2026-08-31T21:59:59.000Z"
+>           }
+>         }
+>       }
+>     ]
+>   }
+> }
+> ```
+>
+> `lowest30` is calculated from the price history in the 30-day period before
+> the promotion start. It is not stored on the promotion record. Historical
+> prices must be archived instead of edited or deleted.
+
+<br>
+
+> [!NOTE]
 > **POST:** `/api/orders`<br>
 > **Description:** `Adds the order to the database and returns a payment link.`
 >
